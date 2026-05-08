@@ -24,7 +24,6 @@ for r in coll.aggregate(pipeline):
     print(f" - {r['_id']}: {round(r['avgScore'], 2)}")
 
 # Aufgabe 3.3
-# Zuerst Index erstellen (falls noch nicht da)
 coll.create_index([("address.coord", GEOSPHERE)])
 
 # 1. Koordinaten von Le Perigord finden
@@ -45,11 +44,10 @@ if perigord:
 # Aufgabe 3.4
 def restaurant_search_app():
     while True:
-        print("\n--- Restaurant-Suche & Bewertung ---")
+        print("\nRestaurant-Suche & Bewertung")
         name_in = input("Name suchen (leer lassen für alle): ").strip()
         kueche_in = input("Küche suchen (leer lassen für alle): ").strip()
 
-        # Query dynamisch aufbauen
         query = {}
         if name_in:
             query["name"] = {"$regex": name_in, "$options": "i"} 
