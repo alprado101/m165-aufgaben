@@ -26,11 +26,9 @@ for r in coll.aggregate(pipeline):
 # Aufgabe 3.3
 coll.create_index([("address.coord", GEOSPHERE)])
 
-# 1. Koordinaten von Le Perigord finden
 perigord = coll.find_one({"name": "Le Perigord"})
 if perigord:
     coords = perigord["address"]["coord"]
-    # 2. Den nächsten Nachbarn suchen
     nachbar = coll.find_one({
         "name": {"$ne": "Le Perigord"},
         "address.coord": {
@@ -54,7 +52,6 @@ def restaurant_search_app():
         if kueche_in:
             query["cuisine"] = {"$regex": kueche_in, "$options": "i"}
 
-        # Ergebnisse finden
         results = list(coll.find(query).limit(10))
 
         if not results:
@@ -62,12 +59,10 @@ def restaurant_search_app():
             if input("Beenden? (y/n): ").lower() == "n": break
             continue
 
-        # Ergebnisse anzeigen
         print("\nErgebnisse:")
         for i, res in enumerate(results):
             print(f"[{i}] {res['name']} ({res['cuisine']})")
 
-        # Auswahl zur Bewertung
         wahl = input("\nIndex wählen für Bewertung (oder Enter für neue Suche): ")
         
         if wahl.isdigit() and int(wahl) < len(results):
@@ -76,7 +71,7 @@ def restaurant_search_app():
             
             #  Aufgabe 3.5
             new_grade = {
-                "date": datetime.datetime.now(), # Aktuelles Datum
+                "date": datetime.datetime.now(),
                 "grade": "A", 
                 "score": new_score
             }

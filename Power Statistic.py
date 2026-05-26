@@ -8,7 +8,7 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["system_monitor"]
 logs = db["power_stats"]
 
-# Aufgabe 5.1: Klasse Power erstellen
+# Aufgabe 5.1
 class Power:
     def __init__(self, cpu=None, ram_total=None, ram_used=None, timestamp=None):
         if cpu is None:
@@ -26,7 +26,7 @@ class Power:
     def to_dict(self):
         return vars(self)
 
-# Aufgabe 5.2: Logging-Applikation mit 10.000er Limit
+# Aufgabe 5.2
 def start_logging():
     print("Logging gestartet... Drücke Strg+C, um das Logging zu beenden und den Graphen anzuzeigen.")
     try:
@@ -47,7 +47,7 @@ def start_logging():
         print("\nLogging beendet. Graph wird geladen...")
         show_graph()
 
-# Aufgabe 5.3: Zusätzliche Applikation für den Graphen
+# Aufgabe 5.3
 def show_graph():
     data = list(logs.find().sort("timestamp", -1).limit(60))
     data.reverse() 
@@ -58,7 +58,7 @@ def show_graph():
 
     times = [d["timestamp"].strftime("%H:%M:%S") for d in data]
     cpu_vals = [d["cpu"] for d in data]
-    ram_vals = [d["ram_used"] / (1024**3) for d in data] # Umrechnung in GB
+    ram_vals = [d["ram_used"] / (1024**3) for d in data] 
 
     fig, ax1 = plt.subplots(figsize=(10, 6))
 

@@ -2,7 +2,7 @@ import os
 from pymongo import MongoClient
 import gridfs
 
-# Aufgabe 7.1: Theorie & Beobachtung
+# Aufgabe 7.1
 """
 FRAGE: Wie wird die Verbindung der einzelnen Documents zueinander hergestellt?
 ANTWORT: GridFS nutzt zwei Collections. In 'fs.files' liegt das Hauptdokument mit einer 
@@ -15,66 +15,43 @@ ANTWORT: Die Daten werden als reine Binärdaten (BSON-Typ: binData) gespeichert.
 Es findet keine Text-Codierung (wie z.B. Base64) statt, was Speicherplatz spart.
 """
 
-# Aufgabe 7.2: Fotoalbum Applikation
-
+# Aufgabe 7.2
 class PhotoAlbum:
     def __init__(self, connection_string):
         self.client = MongoClient(connection_string)
         self.db = self.client['photo_album_db']
         self.fs = gridfs.GridFS(self.db)
 
+    # Aufgabe 7.2.1
     def add_photo(self, file_path, album_name):
-        """
-        Speichert ein Bild in GridFS.
-        Laut Dokumentation können Metadaten über das Argument 'metadata' 
-        als Dictionary mitgegeben werden.
-        """
         if not os.path.exists(file_path):
-            print(f"❌ Datei {file_path} nicht gefunden.")
+            print(f"Datei {file_path} nicht gefunden.")
             return
 
         filename = os.path.basename(file_path)
-        
         with open(file_path, 'rb') as f:
-            file_id = self.fs.put(
-                f, 
-                filename=filename, 
-                metadata={"album": album_name}
-            )
-        print(f"✅ Foto '{filename}' wurde dem Album '{album_name}' hinzugefügt. (ID: {file_id})")
+            self.fs.put(f, filename=filename, metadata={"album": album_name})
+        print(f"Foto '{filename}' zu Album '{album_name}' hinzugefügt.")
 
+    # Aufgabe 7.2.2
     def download_album(self, album_name):
-        """
-        Sucht alle Dateien, die in ihren Metadaten den passenden Albumnamen haben,
-        und stellt sie im lokalen Ordner wieder her.
-        """
-        print(f"\n--- Download Album: {album_name} ---")
+        files = self.db['fs.files'].find({"metadata.album": album_name})
         
-        query = {"metadata.album": album_name}
-        files = self.db['fs.files'].find(query)
-        
-        found = False
+        if not os.path.exists("downloads"):
+            os.makedirs("downloads")
+
         for file_info in files:
-            found = True
             file_id = file_info['_id']
             filename = file_info['filename']
             
-            if not os.path.exists("downloads"):
-                os.makedirs("downloads")
-            
+            data = self.fs.get(file_id).read()
             restore_path = os.path.join("downloads", f"{album_name}_{filename}")
             
-            data = self.fs.get(file_id).read()
             with open(restore_path, 'wb') as f:
                 f.write(data)
-            print(f" > '{filename}' wiederhergestellt unter: {restore_path}")
-            
-        if not found:
-            print(f"ℹ️ Keine Fotos im Album '{album_name}' gefunden.")
+            print(f"Wiederhergestellt: {restore_path}")
 
-
+# Aufgabe 7.2.3
 if __name__ == "__main__":
-    conn_string = 'mongodb://localhost:27017/'
-    album_app = PhotoAlbum(conn_string)
-
-    album_app.download_album("Sommerurlaub")
+    conn = 'mongodb://localhost:27017/'
+    album = PhotoAlbum(conn)

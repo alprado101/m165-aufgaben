@@ -2,7 +2,7 @@ import os
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
-# Aufgabe 4.1: Recherche & PATH-Programm
+# Aufgabe 4.1
 """
 RECHERCHE:
 Umgebungsvariablen werden in Python über das Modul 'os' mit 'os.getenv()' ausgelesen.
@@ -12,29 +12,28 @@ Dies dient der Sicherheit, damit Passwörter nicht im Code stehen.
 
 path_variable = os.getenv("PATH")
 
-print("--- Aufgabe 4.1: Recherche & PATH-Ausgabe ---")
+print("Aufgabe 4.1")
 if path_variable:
     print(f"Erfolgreich ausgelesen: {path_variable[:100]}...")
 else:
-    print("❌ Fehler: PATH konnte nicht gefunden werden.")
+    print("Fehler: PATH konnte nicht gefunden werden.")
 
 
-# Aufgabe 4.2: Connection-String & Cloud-Verbindung
+# Aufgabe 4.2
 connection_string = os.getenv("MONGO_URI")
 
-print("\n--- Aufgabe 4.2: Cloud-Datenbank Verbindung ---")
+print("\nAufgabe 4.2")
 
 if not connection_string:
-    print("❌ Fehler: Die Umgebungsvariable 'MONGO_URI' ist nicht gesetzt!")
-    print("Tipp: Setze sie im Terminal mit: $env:MONGO_URI = 'dein_link'")
+    print("Fehler: Die Umgebungsvariable 'MONGO_URI' ist nicht gesetzt!")
 else:
     try:
         client = MongoClient(connection_string, serverSelectionTimeoutMS=5000)
         client.admin.command('ping')
-        print("✅ Verbindung zur Cloud-Datenbank war erfolgreich!")
+        print("Verbindung zur Cloud-Datenbank war erfolgreich!")
         print("Vorhandene Datenbanken:", client.list_database_names())
         
     except ConnectionFailure:
-        print("❌ Verbindung fehlgeschlagen: Prüfe deinen Link oder deine IP-Freigabe.")
+        print("Verbindung fehlgeschlagen: Prüfe deinen Link oder deine IP-Freigabe.")
     except Exception as e:
-        print(f"❌ Ein unerwarteter Fehler ist aufgetreten: {e}")
+        print(f"Ein unerwarteter Fehler ist aufgetreten: {e}")
